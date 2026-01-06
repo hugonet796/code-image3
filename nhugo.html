@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Code → Image (PC)</title>
+<style>
+body{
+  font-family: Arial;
+  background:#111;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.box{
+  background:#1e1e1e;
+  padding:20px;
+  border-radius:10px;
+  width:360px;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:6px;
+  border:none;
+}
+button{
+  background:#3b82f6;
+  color:white;
+  cursor:pointer;
+}
+.plus{background:#22c55e;}
+img{
+  max-width:100%;
+  margin-top:10px;
+  border-radius:8px;
+  display:none;
+}
+.error{color:#ff5555;display:none;text-align:center;}
+.add{display:none;margin-top:10px;border-top:1px solid #333;padding-top:10px;}
+</style>
+</head>
+
+<body>
+<div class="box">
+  <h3>Entrer un code</h3>
+
+  <input id="codeInput" placeholder="Code">
+  <button onclick="check()">Valider</button>
+
+  <div class="error" id="error">Code introuvable</div>
+  <img id="img">
+
+  <button class="plus" onclick="toggleAdd()">➕ Ajouter image + code</button>
+
+  <div class="add" id="addBox">
+    <input id="newCode" placeholder="Nouveau code">
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="addCode()">Ajouter</button>
+  </div>
+</div>
+
+<script>
+const codeInput = document.getElementById("codeInput");
+const error = document.getElementById("error");
+const img = document.getElementById("img");
+const addBox = document.getElementById("addBox");
+const newCode = document.getElementById("newCode");
+const fileInput = document.getElementById("fileInput");
+
+let codes = JSON.parse(localStorage.getItem("codesLocal")) || {};
+
+function check(){
+  const c = codeInput.value.trim();
+  if(codes[c]){
+    img.src = codes[c];
+    img.style.display="block";
+    error.style.display="none";
+  } else {
+    img.style.display="none";
+    error.style.display="block";
+  }
+}
+
+function toggleAdd(){
+  addBox.style.display =
+    addBox.style.display === "block" ? "none" : "block";
+}
+
+function addCode(){
+  const c = newCode.value.trim();
+  const f = fileInput.files[0];
+  if(!c || !f){
+    alert("Choisis un code et une image");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(){
+    codes[c] = reader.result;
+    localStorage.setItem("codesLocal", JSON.stringify(codes));
+    alert("Ajouté ✔️");
+    newCode.value = "";
+    fileInput.value = "";
+  };
+  reader.readAsDataURL(f);
+}
+</script>
+</body>
+</html>
